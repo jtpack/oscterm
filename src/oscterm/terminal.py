@@ -56,13 +56,16 @@ def start_terminal(
     session = PromptSession()
 
     try:
-        with patch_stdout():
+        with (patch_stdout()):
             while True:
                 try:
                     command = session.prompt("osc-term>").strip()
 
                     if command[0] == '/':
-                        # This is a command to send an OSC message.
+                        #
+                        # This is an OSC address.
+                        #
+
                         address, arguments = parse_osc_command(command)
 
                         if address:
@@ -72,53 +75,93 @@ def start_terminal(
                                 print("Warning: OSC send destination not set")
 
                     else:
+                        #
+                        # This is not an OSC address. It must be a command.
+                        #
+
                         try:
                             parts = shlex.split(command)
                             if parts[0] == 'exit':
                                 break
 
-                            elif parts[0] == 'set-listener':
-                                listen_host = parts[1]
+                            elif parts[0] in ['listener', 'l']:
+                                if len(parts) == 1:
+                                    # The command was just the word listener.
+                                    # Print the current listener settings.
+                                    #
 
-                                try:
-                                    listen_port = int(parts[2])
-
-                                    # Shut down OSC server if one already exists
                                     if server is not None and thread is not None:
-                                        stop_osc_server(server, thread)
+                                        print(f"{listen_host} {listen_port}")
+                                    else:
+                                        print(f"Not listening for OSC messages")
 
-                                    # Set up OSC server to start listening for messages
-                                    server, thread = start_osc_server(listen_host, listen_port, disp)
-
-                                except ValueError:
-                                    print(f"Invalid port: {parts[2]}")
-
-                            elif parts[0] == 'set-sender':
-                                send_host = parts[1]
-
-                                try:
-                                    send_port = int(parts[2])
-
-                                    # Set up a client for sending OSC messages
-                                    create_osc_client(
-                                        host=send_host,
-                                        port=send_port
-                                    )
-
-                                except ValueError:
-                                    print(f"Invalid port: {parts[2]}")
-
-                            elif parts[0] == 'listener':
-                                if server is not None and thread is not None:
-                                    print(f"Listening on {listen_host} {listen_port}")
                                 else:
-                                    print(f"Not listening for OSC messages")
+                                    # The command is the word listener, followed by
+                                    # arguments. Treat them as a host and port and
+                                    # set up a new listener.
+                                    #
 
-                            elif parts[0] == 'sender':
-                                if client is not None:
-                                    print(f"Sending to {send_host} {send_port}")
+                                    listen_host = parts[1]
+
+                                    try:
+                                        listen_port = int(parts[2])
+
+                                        if listen_port < 0 or listen_port > 65535:
+                                            print("Error: Invalid port number (must be between 0 and 65535)")
+                                            continue
+
+                                        # Shut down OSC server if one already exists
+                                        if server is not None and thread is not None:
+                                            stop_osc_server(server, thread)
+
+                                        # Set up OSC server to start listening for messages
+                                        try:
+                                            server, thread = start_osc_server(listen_host, listen_port, disp)
+
+                                        except OSError as e:
+                                            if "address already in use" in str(e).lower():
+                                                print("Error: Address already in use")
+                                                server = None
+                                                thread = None
+                                            else:
+                                                print(f"Error: {e}")
+
+                                    except ValueError:
+                                        print(f"Invalid port: {parts[2]} (must be an integer between 0 and 65535)")
+
+                            elif parts[0] in ['sender', 's']:
+                                if len(parts) == 1:
+                                    # The command is just the word sender, without any
+                                    # arguments. Print the current listener settings.
+                                    #
+
+                                    if client is not None:
+                                        print(f"Sending to {send_host} {send_port}")
+                                    else:
+                                        print(f"OSC send destination not set")
+
                                 else:
-                                    print(f"OSC send destination not set")
+                                    # Arguments were supplied as well.
+                                    # Treat them as a hostname/IP and port number,
+                                    # and create a new OSC sender
+                                    #
+
+                                    send_host = parts[1]
+
+                                    try:
+                                        send_port = int(parts[2])
+
+                                        # Set up a client for sending OSC messages
+                                        client = create_osc_client(
+                                            host=send_host,
+                                            port=send_port
+                                        )
+
+                                    except ValueError:
+                                        print(f"Invalid port: {parts[2]}")
+
+                            elif parts[0] in ['help', '?']:
+                                print_help_message()
 
                             else:
                                 print(f"Unknown command: {parts[0]}")
@@ -174,8 +217,8 @@ def start_osc_server(host, port, disp):
     )
 
     thread.start()
-    logger.debug(f"Listening for OSC messages on {host} {port}")
-    print(f"Listening for OSC messages on {host} {port}")
+    logger.debug(f"Listening on {host} {port}")
+    print(f"Listening on {host} {port}")
 
     return server, thread
 
@@ -192,3 +235,38 @@ def create_osc_client(host, port):
     logger.debug(f"Created sender for {host} {port}")
     print(f"Sending to {host} {port}")
     return client
+
+
+def print_help_message():
+    help_text = """
+----------------------------------------------------------
+oscterm Commands Reference
+------------------
+help or ? - Prints this command reference message.
+------------------
+listener or l
+- When the word listener is entered without any
+  arguments, it is treated as a request for the current
+  OSC listener settings, which are printed.
+- When listener is followed by a hostname or IP address and
+  a port number, it is treated as a command to start
+  listening for OSC messages. 
+- Example 1: listener localhost 1375
+- Example 2: listener 192.168.0.45 52000
+------------------
+sender or s
+- When the word sender is entered without any
+  arguments, it is treated as a request for the current
+  OSC sender settings, which are printed.
+- When sender is followed by a hostname or IP address and
+  a port number, it is treated as a command to create a new
+  OSC sender. 
+- Example 1: sender localhost 1375
+- Example 2: sender 192.168.0.45 52000
+------------------
+exit
+- Exits oscterm.
+- Ctrl-D on the keyboard does the same thing.
+----------------------------------------------------------
+    """
+    print(help_text)

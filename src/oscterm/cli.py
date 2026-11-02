@@ -18,19 +18,21 @@ def main() -> int:
     parser.add_argument(
         "--lhost",
         type=str,
-        help="Local hostname or IP address, used for receiving OSC messages"
+        help="Listener hostname or IP address, used for receiving OSC messages",
+        default="localhost"
     )
 
     parser.add_argument(
         "--lport",
         type=int,
-        help="Local port number, used for receiving OSC messages"
+        help="Listener port number, used for receiving OSC messages"
     )
 
     parser.add_argument(
         "--shost",
         type=str,
-        help="The hostname or IP address of the remote machine to send OSC messages to"
+        help="The hostname or IP address of the remote machine to send OSC messages to",
+        default="localhost"
     )
 
     parser.add_argument(
