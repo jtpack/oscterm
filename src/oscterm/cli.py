@@ -8,6 +8,9 @@ from oscterm.terminal import start_terminal
 logger = logging.getLogger(__name__)
 
 
+# TODO: send port without host sends to localhost
+# TODO: listen port without host listens on 0.0.0.0
+
 def main() -> int:
     setup_logging(
         console_level=logging.INFO
@@ -18,8 +21,8 @@ def main() -> int:
     parser.add_argument(
         "--lhost",
         type=str,
-        help="Listener hostname or IP address, used for receiving OSC messages",
-        default="localhost"
+        help="Listener hostname or IP address, used for receiving OSC messages. If a port is specified without a host, then 0.0.0.0 is used.",
+        default="0.0.0.0"
     )
 
     parser.add_argument(
@@ -31,7 +34,7 @@ def main() -> int:
     parser.add_argument(
         "--shost",
         type=str,
-        help="The hostname or IP address of the remote machine to send OSC messages to",
+        help="The hostname or IP address of the remote machine to send OSC messages to. If a port is specified without a host, then localhost is used.",
         default="localhost"
     )
 
