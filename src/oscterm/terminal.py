@@ -163,19 +163,32 @@ def start_terminal(
                                         print(f"OSC send destination not set")
 
                                 else:
-                                    # Arguments were supplied as well.
-                                    # Treat them as a hostname/IP and port number,
-                                    # and create a new OSC sender
-                                    #
+                                    # Arguments were supplied as well, so we need to
+                                    # create a new sender.
 
-                                    send_host = parts[1]
+                                    if len(parts) == 2:
+                                        # Only one argument was supplied, so we will assume
+                                        # that it is a port number and we will send to
+                                        # localhost
+                                        #
 
-                                    if len(parts) != 3:
-                                        print("Error: Invalid host and port")
+                                        send_host = 'localhost'
+                                        port_index = 1
+
+                                    elif len(parts) == 3:
+                                        # Two arguments were supplied, so the first is the host and
+                                        # the second is the port number.
+                                        #
+
+                                        send_host = parts[1]
+                                        port_index = 2
+
+                                    else:
+                                        print("Invalid host and port")
                                         continue
 
                                     try:
-                                        send_port = int(parts[2])
+                                        send_port = int(parts[port_index])
 
                                         # Set up a client for sending OSC messages
                                         client = create_osc_client(
@@ -210,9 +223,9 @@ def print_osc_message(address, *args):
     if len(args) == 0:
         print(f"{address}")
     elif len(args) == 1:
-        print(f"{address}: {args[0]}")
+        print(f"{address} {args[0]}")
     else:
-        print(f"{address}: {args}")
+        print(f"{address} {args}")
 
 
 def parse_osc_command(command):
@@ -301,27 +314,30 @@ oscterm Commands Reference
 help or ? - Prints this command reference message.
 ------------------
 listener or l
-- When the word listener is entered without any
+- When the word listener (or the letter l) is entered without any
   arguments, it is treated as a request for the current
   OSC listener settings, which are printed.
-- When listener is followed by a port number, a new listener
+- When listener (or l) is followed by a port number, a new listener
   is created using all network interfaces on that port.
-- When listener is followed by a hostname (or IP address) and
+- When listener (or l) is followed by a hostname (or IP address) and
   a port number, a new listener is created for that host/IP only
   on the specified port. 
 - Example 1: listener 1375
 - Example 2: listener localhost 1235
-- Example 2: listener 192.168.0.45 52000
+- Example 2: l 192.168.0.45 52000
 ------------------
 sender or s
-- When the word sender is entered without any
+- When the word sender (or the letter s) is entered without any
   arguments, it is treated as a request for the current
   OSC sender settings, which are printed.
-- When sender is followed by a hostname or IP address and
-  a port number, it is treated as a command to create a new
-  OSC sender. 
+- When sender (or s) is followed by a port number, subsequent
+  OSC messages will be sent to localhost on the specified port.
+- When sender (or s) is followed by a hostname (or IP address) and
+  a port number, subsequent OSC messages will be sent to that host
+  and port.`
 - Example 1: sender localhost 1375
-- Example 2: sender 192.168.0.45 52000
+- Example 2: s 1375
+- Example 3: sender 192.168.0.45 52000
 ------------------
 exit
 - Exits oscterm.

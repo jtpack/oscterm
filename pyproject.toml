@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "oscterm"
 description = "A command line terminal for OSC communication"
-version = "0.0.1"
+version = "0.0.2"
 requires-python = ">= 3.9"
 dependencies = [
     "python-osc",
