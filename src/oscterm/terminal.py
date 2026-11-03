@@ -59,7 +59,7 @@ def start_terminal(
         with (patch_stdout()):
             while True:
                 try:
-                    command = session.prompt("osc-term>").strip()
+                    command = session.prompt("oscterm>").strip()
 
                     if command[0] == '/':
                         #
@@ -228,6 +228,9 @@ def parse_osc_command(command):
     address = parts[0]
     arguments = parts[1:]
 
+    # Convert all arguments to correct types
+    arguments = [string_value_to_proper_type(argument) for argument in arguments]
+
     return address, arguments
 
 
@@ -261,6 +264,33 @@ def create_osc_client(host, port):
     logger.debug(f"Created sender for {host} {port}")
     print(f"Sending to {host} {port}")
     return client
+
+
+def string_value_to_proper_type(value: str):
+    value = value.strip()
+
+    # Try Boolean
+    if value == 'True':
+        return True
+
+    if value == 'False':
+        return False
+
+    # Try Integer
+    try:
+        return int(value)
+    except ValueError:
+        pass
+
+    # Try Float
+    try:
+        if '.' in value:
+            return float(value)
+    except ValueError:
+        pass
+
+    # If none of the above worked, return as a string
+    return value
 
 
 def print_help_message():
