@@ -101,6 +101,10 @@ def start_terminal(
                                     # set up a new listener.
                                     #
 
+                                    if len(parts) != 3:
+                                        print("Error: Invalid host and port")
+                                        continue
+
                                     listen_host = parts[1]
 
                                     try:
@@ -147,6 +151,10 @@ def start_terminal(
                                     #
 
                                     send_host = parts[1]
+
+                                    if len(parts) != 3:
+                                        print("Error: Invalid host and port")
+                                        continue
 
                                     try:
                                         send_port = int(parts[2])
