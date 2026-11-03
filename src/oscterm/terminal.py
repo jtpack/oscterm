@@ -97,18 +97,36 @@ def start_terminal(
 
                                 else:
                                     # The command is the word listener, followed by
-                                    # arguments. Treat them as a host and port and
-                                    # set up a new listener.
-                                    #
+                                    # arguments, so this is a command to set up a
+                                    # new listener.
 
-                                    if len(parts) != 3:
-                                        print("Error: Invalid host and port")
+                                    if len(parts) == 2:
+                                        # Only one argument has been specified, so we will assume
+                                        # that it is a port number and will listen on 0.0.0.0,
+                                        # which means all available network interfaces.
+                                        #
+
+                                        listen_host = '0.0.0.0'
+                                        port_index = 1
+
+                                    elif len(parts) == 3:
+                                        # Two arguments were supplied, so the first is the host and
+                                        # the second is the port number.
+                                        #
+
+                                        listen_host = parts[1]
+                                        port_index = 2
+
+                                    else:
+                                        print("Invalid host and port")
                                         continue
 
-                                    listen_host = parts[1]
+                                    #
+                                    # Create the listener
+                                    #
 
                                     try:
-                                        listen_port = int(parts[2])
+                                        listen_port = int(parts[port_index])
 
                                         if listen_port < 0 or listen_port > 65535:
                                             print("Error: Invalid port number (must be between 0 and 65535)")
@@ -256,10 +274,13 @@ listener or l
 - When the word listener is entered without any
   arguments, it is treated as a request for the current
   OSC listener settings, which are printed.
-- When listener is followed by a hostname or IP address and
-  a port number, it is treated as a command to start
-  listening for OSC messages. 
-- Example 1: listener localhost 1375
+- When listener is followed by a port number, a new listener
+  is created using all network interfaces on that port.
+- When listener is followed by a hostname (or IP address) and
+  a port number, a new listener is created for that host/IP only
+  on the specified port. 
+- Example 1: listener 1375
+- Example 2: listener localhost 1235
 - Example 2: listener 192.168.0.45 52000
 ------------------
 sender or s
