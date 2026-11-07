@@ -1,3 +1,7 @@
+- Changed 'listener' command to 'listen'
+- Changed 'sender' command to 'send'
+
+
 ## Version 0.0.2
 
 - Added help command

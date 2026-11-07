@@ -84,9 +84,9 @@ def start_terminal(
                             if parts[0] == 'exit':
                                 break
 
-                            elif parts[0] in ['listener', 'l']:
+                            elif parts[0] in ['listen', 'l']:
                                 if len(parts) == 1:
-                                    # The command was just the word listener.
+                                    # The command was just the word listen.
                                     # Print the current listener settings.
                                     #
 
@@ -96,7 +96,7 @@ def start_terminal(
                                         print(f"Not listening for OSC messages")
 
                                 else:
-                                    # The command is the word listener, followed by
+                                    # The command is the word listen, followed by
                                     # arguments, so this is a command to set up a
                                     # new listener.
 
@@ -151,10 +151,10 @@ def start_terminal(
                                     except ValueError:
                                         print(f"Invalid port: {parts[2]} (must be an integer between 0 and 65535)")
 
-                            elif parts[0] in ['sender', 's']:
+                            elif parts[0] in ['send', 's']:
                                 if len(parts) == 1:
-                                    # The command is just the word sender, without any
-                                    # arguments. Print the current listener settings.
+                                    # The command is just the word send, without any
+                                    # arguments. Print the current send settings.
                                     #
 
                                     if client is not None:
@@ -274,7 +274,7 @@ def stop_osc_server(server, thread):
 
 def create_osc_client(host, port):
     client = udp_client.SimpleUDPClient(host, port)
-    logger.debug(f"Created sender for {host} {port}")
+    logger.debug(f"Sending to {host} {port}")
     print(f"Sending to {host} {port}")
     return client
 
@@ -313,31 +313,31 @@ oscterm Commands Reference
 ------------------
 help or ? - Prints this command reference message.
 ------------------
-listener or l
-- When the word listener (or the letter l) is entered without any
+listen or l
+- When the word listen (or the letter l) is entered without any
   arguments, it is treated as a request for the current
   OSC listener settings, which are printed.
-- When listener (or l) is followed by a port number, a new listener
+- When listen (or l) is followed by a port number, a new listener
   is created using all network interfaces on that port.
-- When listener (or l) is followed by a hostname (or IP address) and
+- When listen (or l) is followed by a hostname (or IP address) and
   a port number, a new listener is created for that host/IP only
   on the specified port. 
-- Example 1: listener 1375
-- Example 2: listener localhost 1235
+- Example 1: listen 1375
+- Example 2: listen localhost 1235
 - Example 2: l 192.168.0.45 52000
 ------------------
-sender or s
-- When the word sender (or the letter s) is entered without any
+send or s
+- When the word send (or the letter s) is entered without any
   arguments, it is treated as a request for the current
-  OSC sender settings, which are printed.
-- When sender (or s) is followed by a port number, subsequent
+  OSC send settings, which are printed.
+- When send (or s) is followed by a port number, subsequent
   OSC messages will be sent to localhost on the specified port.
-- When sender (or s) is followed by a hostname (or IP address) and
+- When send (or s) is followed by a hostname (or IP address) and
   a port number, subsequent OSC messages will be sent to that host
   and port.`
-- Example 1: sender localhost 1375
+- Example 1: send localhost 1375
 - Example 2: s 1375
-- Example 3: sender 192.168.0.45 52000
+- Example 3: send 192.168.0.45 52000
 ------------------
 exit
 - Exits oscterm.
