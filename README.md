@@ -19,7 +19,7 @@ Platforms:
 
 ### 1. Make sure git is installed.
 
-### 2. If it isn't already installed, install pipx
+### 2. Install pipx if it isn't already installed
 
 macOS:
 - Use Homebrew to install pipx: `brew install pipx`
@@ -29,17 +29,24 @@ Windows (using PowerShell):
 - `py -m pip install --user pipx`
 - `py -m pipx ensurepath`
 
-Linux:
-
-For Debian-based distributions like Raspberry Pi OS:
+Linux (Ubuntu or Raspberry Pi OS):
 - `sudo apt update`
 - `sudo apt install pipx`
 - `pipx ensurepath`
 
 ### 3. install oscterm using pipx
 
+macOS and Linux:
 - Use pipx to install oscterm: `pipx install git+https://github.com/jtpack/oscterm.git`
 - Later, to update oscterm when there's a new version: `pipx upgrade oscterm`
+
+Windows:
+- First clone the oscterm repository:
+  - `cd ~`
+  - `git clone https://github.com/jtpack/oscterm.git`
+- Then install with pipx:
+  - `cd oscterm`
+  - `pipx install .`
 
 ## Option B: Download the Python Code and Run In a Virtual Environment
 
