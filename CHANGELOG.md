@@ -1,5 +1,6 @@
 - Changed 'listener' command to 'listen'
 - Changed 'sender' command to 'send'
+- Improved error handling for invalid ports
 
 
 ## Version 0.0.2

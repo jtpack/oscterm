@@ -128,28 +128,29 @@ def start_terminal(
                                     try:
                                         listen_port = int(parts[port_index])
 
-                                        if listen_port < 0 or listen_port > 65535:
-                                            print("Error: Invalid port number (must be between 0 and 65535)")
-                                            continue
-
-                                        # Shut down OSC server if one already exists
-                                        if server is not None and thread is not None:
-                                            stop_osc_server(server, thread)
-
-                                        # Set up OSC server to start listening for messages
-                                        try:
-                                            server, thread = start_osc_server(listen_host, listen_port, disp)
-
-                                        except OSError as e:
-                                            if "address already in use" in str(e).lower():
-                                                print("Error: Address already in use")
-                                                server = None
-                                                thread = None
-                                            else:
-                                                print(f"Error: {e}")
-
                                     except ValueError:
-                                        print(f"Invalid port: {parts[2]} (must be an integer between 0 and 65535)")
+                                        print(f"{parts[port_index]} is not a valid port (must be an integer between 0 and 65535)")
+                                        continue
+
+                                    if listen_port < 0 or listen_port > 65535:
+                                        print(f"{parts[port_index]} is not a valid port (must be an integer between 0 and 65535)")
+                                        continue
+
+                                    # Shut down OSC server if one already exists
+                                    if server is not None and thread is not None:
+                                        stop_osc_server(server, thread)
+
+                                    # Set up OSC server to start listening for messages
+                                    try:
+                                        server, thread = start_osc_server(listen_host, listen_port, disp)
+
+                                    except OSError as e:
+                                        if "address already in use" in str(e).lower():
+                                            print("Error: Address already in use")
+                                            server = None
+                                            thread = None
+                                        else:
+                                            print(f"Error: {e}")
 
                             elif parts[0] in ['send', 's']:
                                 if len(parts) == 1:
@@ -190,14 +191,19 @@ def start_terminal(
                                     try:
                                         send_port = int(parts[port_index])
 
-                                        # Set up a client for sending OSC messages
-                                        client = create_osc_client(
-                                            host=send_host,
-                                            port=send_port
-                                        )
-
                                     except ValueError:
-                                        print(f"Invalid port: {parts[2]}")
+                                        print(f"{parts[port_index]} is not a valid port (must be an integer between 0 and 65535)")
+                                        continue
+                                        
+                                    if send_port < 0 or send_port > 65535:
+                                        print(f"{parts[port_index]} is not a valid port (must be an integer between 0 and 65535)")
+                                        continue
+
+                                    # Set up a client for sending OSC messages
+                                    client = create_osc_client(
+                                        host=send_host,
+                                        port=send_port
+                                    )
 
                             elif parts[0] in ['help', '?']:
                                 print_help_message()
