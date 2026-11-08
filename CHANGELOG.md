@@ -1,3 +1,5 @@
+## Version 0.0.3
+
 - Changed 'listener' command to 'listen'
 - Changed 'sender' command to 'send'
 - Improved error handling for invalid ports
